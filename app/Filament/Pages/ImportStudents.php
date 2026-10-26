@@ -10,6 +10,7 @@ use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 /**
@@ -76,12 +77,53 @@ class ImportStudents extends Page
 
     public function startImport(): void
     {
-        $file = $this->form->getState()['file'] ?? null;
+        try {
+            $file = $this->form->getState()['file'] ?? null;
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+
+            Notification::make()
+                ->title('Upload bermasalah')
+                ->body('File upload tidak ditemukan (mungkin kedaluwarsa). Silakan upload ulang file lalu klik Mulai Import.')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        $cleanup = false;
 
         if ($file instanceof TemporaryUploadedFile) {
-            $path = $file->getRealPath();
+            if (! $file->exists()) {
+                Notification::make()
+                    ->title('File upload kedaluwarsa')
+                    ->body('Silakan upload ulang file lalu klik Mulai Import.')
+                    ->danger()
+                    ->send();
+
+                return;
+            }
+
+            // Salin ke lokasi stabil: file livewire-tmp bisa dibersihkan
+            // otomatis sebelum polling `tick()` selesai membacanya.
+            $stored = 'imports/import-'.(string) Str::uuid().'.'.$file->getClientOriginalExtension();
+            Storage::disk('local')->put($stored, $file->readStream());
+            $path = Storage::disk('local')->path($stored);
+            $cleanup = true;
         } elseif (is_string($file) && $file !== '') {
             $path = Storage::disk('local')->path($file);
+
+            if (! is_file($path)) {
+                Notification::make()
+                    ->title('File tidak ditemukan')
+                    ->body('Silakan upload ulang file lalu klik Mulai Import.')
+                    ->danger()
+                    ->send();
+
+                return;
+            }
         } else {
             Notification::make()
                 ->title('Pilih file dulu')
@@ -92,11 +134,29 @@ class ImportStudents extends Page
         }
 
         try {
-            $this->runId = StudentImportRunner::start($path);
+            $this->runId = StudentImportRunner::start($path, $cleanup);
         } catch (\InvalidArgumentException $e) {
+            if ($cleanup) {
+                @unlink($path);
+            }
+
             Notification::make()
                 ->title('Format tidak dikenali')
                 ->body($e->getMessage())
+                ->danger()
+                ->send();
+
+            return;
+        } catch (\Throwable $e) {
+            if ($cleanup) {
+                @unlink($path);
+            }
+
+            report($e);
+
+            Notification::make()
+                ->title('Import gagal dimulai')
+                ->body('Terjadi kesalahan saat membaca file. Coba lagi atau pastikan file tidak rusak.')
                 ->danger()
                 ->send();
 
@@ -113,7 +173,29 @@ class ImportStudents extends Page
             return;
         }
 
-        $this->progress = StudentImportRunner::tick($this->runId);
+        try {
+            $this->progress = StudentImportRunner::tick($this->runId);
+        } catch (\Throwable $e) {
+            report($e);
+
+            $this->progress = [
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat memproses file. Silakan coba lagi.',
+                'total' => (int) ($this->progress['total'] ?? 0),
+                'processed' => (int) ($this->progress['processed'] ?? 0),
+                'imported' => (int) ($this->progress['imported'] ?? 0),
+                'skipped' => (int) ($this->progress['skipped'] ?? 0),
+                'skips' => [],
+            ];
+
+            Notification::make()
+                ->title('Import gagal')
+                ->body($this->progress['message'])
+                ->danger()
+                ->send();
+
+            return;
+        }
 
         if ($this->progress['status'] === 'done') {
             Notification::make()
@@ -135,6 +217,12 @@ class ImportStudents extends Page
     public function resetImport(): void
     {
         if ($this->runId !== null) {
+            $state = StudentImportRunner::state($this->runId);
+
+            if (($state['cleanup'] ?? false) && isset($state['path']) && is_string($state['path']) && is_file($state['path'])) {
+                @unlink($state['path']);
+            }
+
             StudentImportRunner::forget($this->runId);
         }
 

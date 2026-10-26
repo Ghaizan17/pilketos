@@ -6,7 +6,9 @@ use App\Models\Classroom;
 use App\Models\Student;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\IReadFilter;
 
 /**
  * Mesin import murid dua format:
@@ -27,6 +29,10 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
  * Chunked + cache-backed agar halaman Filament bisa menampilkan
  * progress bar tanpa queue worker: `start()` sekali, lalu `tick()`
  * berulang (dipoll Livewire) sampai status `done`.
+ *
+ * Setiap baca file hanya memuat rentang sel yang dibutuhkan (read
+ * filter) lalu segera dibebaskan, agar file Dapodik besar tidak
+ * menghabiskan memori PHP.
  */
 class StudentImportRunner
 {
@@ -63,7 +69,7 @@ class StudentImportRunner
      *
      * @throws \InvalidArgumentException bila format file tidak dikenali.
      */
-    public static function start(string $path): string
+    public static function start(string $path, bool $cleanup = false): string
     {
         $mode = static::detectMode($path);
         $total = max(0, static::highestRow($path) - static::spec($mode)['dataStart'] + 1);
@@ -79,6 +85,7 @@ class StudentImportRunner
             'skipped' => 0,
             'skips' => [],
             'classrooms' => [],
+            'cleanup' => $cleanup,
             'status' => 'processing',
             'message' => null,
         ], static::CACHE_TTL);
@@ -102,10 +109,11 @@ class StudentImportRunner
         $to = min($from + $chunkSize - 1, $spec['dataStart'] + $state['total'] - 1);
 
         try {
-            $rows = static::readRows($state['path'], $from, $to, $spec);
+            $rows = static::readRows($state['path'], $from, $to, $state['mode']);
         } catch (\Throwable $e) {
             $state['status'] = 'error';
             $state['message'] = 'Gagal membaca file: '.$e->getMessage();
+            static::cleanupFile($state);
             Cache::put(static::key($runId), $state, static::CACHE_TTL);
 
             return $state;
@@ -156,6 +164,7 @@ class StudentImportRunner
 
         if ($state['processed'] >= $state['total']) {
             $state['status'] = 'done';
+            static::cleanupFile($state);
         }
 
         Cache::put(static::key($runId), $state, static::CACHE_TTL);
@@ -204,10 +213,12 @@ class StudentImportRunner
     /** @return 'dapodik'|'template' */
     protected static function detectMode(string $path): string
     {
-        $sheet = static::loadSheet($path);
+        // Hanya baca 5 baris x 5 kolom pertama (read filter) agar file
+        // Dapodik besar tidak ikut termuat ke memori.
+        $rows = static::loadRange($path, 1, 5, 'A', 'E');
 
         // Dapodik: baris 5 = No | Nama | NIPD | JK | NISN | ...
-        $header5 = $sheet->rangeToArray('A5:E5', null, true, true, false)[0] ?? [];
+        $header5 = $rows[4] ?? [];
         $b5 = mb_strtolower(trim((string) ($header5[1] ?? '')));
         $c5 = mb_strtolower(trim((string) ($header5[2] ?? '')));
 
@@ -216,7 +227,7 @@ class StudentImportRunner
         }
 
         // Template lama: baris 1 = nama | nipd | nisn | jk | kelas.
-        $header1 = $sheet->rangeToArray('A1:E1', null, true, true, false)[0] ?? [];
+        $header1 = $rows[0] ?? [];
         $keys = array_map(fn ($v): string => mb_strtolower(trim((string) $v)), $header1);
 
         if (($keys[0] ?? '') === 'nama' && ($keys[1] ?? '') === 'nipd') {
@@ -231,31 +242,86 @@ class StudentImportRunner
 
     protected static function highestRow(string $path): int
     {
-        return static::loadSheet($path)->getHighestRow();
+        // Hitung via metadata streaming (tanpa memuat sel ke memori).
+        $reader = IOFactory::createReaderForFile($path);
+        $info = $reader->listWorksheetInfo($path);
+
+        return (int) ($info[0]['totalRows'] ?? 0);
     }
 
     /** @return array<int, array<int, mixed>> */
-    protected static function readRows(string $path, int $from, int $to, array $spec): array
+    protected static function readRows(string $path, int $from, int $to, string $mode): array
     {
         if ($from > $to) {
             return [];
         }
 
-        $sheet = static::loadSheet($path);
-        $lastCol = $spec === static::DAPODIK ? 'AQ' : 'E';
+        $lastCol = $mode === 'dapodik' ? 'AQ' : 'E';
 
-        /** @var array<int, array<int, mixed>> $rows */
-        $rows = $sheet->rangeToArray("A{$from}:{$lastCol}{$to}", null, true, true, false);
-
-        return $rows;
+        return static::loadRange($path, $from, $to, 'A', $lastCol);
     }
 
-    protected static function loadSheet(string $path): \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet
+    /**
+     * Muat satu rentang sel saja (read filter), lalu bebaskan memori
+     * spreadsheet segera setelah dibaca.
+     *
+     * @return array<int, array<int, mixed>>
+     */
+    protected static function loadRange(string $path, int $fromRow, int $toRow, string $fromCol, string $toCol): array
     {
         $reader = IOFactory::createReaderForFile($path);
         $reader->setReadDataOnly(true);
+        $reader->setReadFilter(static::readFilter(
+            $fromRow,
+            $toRow,
+            Coordinate::columnIndexFromString($fromCol),
+            Coordinate::columnIndexFromString($toCol),
+        ));
 
-        return $reader->load($path)->getActiveSheet();
+        $spreadsheet = $reader->load($path);
+
+        try {
+            /** @var array<int, array<int, mixed>> $rows */
+            $rows = $spreadsheet->getActiveSheet()->rangeToArray(
+                "{$fromCol}{$fromRow}:{$toCol}{$toRow}", null, true, true, false
+            );
+        } finally {
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+        }
+
+        return array_values($rows);
+    }
+
+    protected static function readFilter(int $fromRow, int $toRow, int $fromCol, int $toCol): IReadFilter
+    {
+        return new class($fromRow, $toRow, $fromCol, $toCol) implements IReadFilter
+        {
+            public function __construct(
+                private int $fromRow,
+                private int $toRow,
+                private int $fromCol,
+                private int $toCol,
+            ) {}
+
+            public function readCell(string $columnAddress, int $row, string $worksheetName = ''): bool
+            {
+                if ($row < $this->fromRow || $row > $this->toRow) {
+                    return false;
+                }
+
+                $col = Coordinate::columnIndexFromString($columnAddress);
+
+                return $col >= $this->fromCol && $col <= $this->toCol;
+            }
+        };
+    }
+
+    protected static function cleanupFile(array $state): void
+    {
+        if (($state['cleanup'] ?? false) && isset($state['path']) && is_string($state['path']) && is_file($state['path'])) {
+            @unlink($state['path']);
+        }
     }
 
     /** @return array<string, mixed> */
