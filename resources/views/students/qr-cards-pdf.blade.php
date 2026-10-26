@@ -36,7 +36,7 @@
                                         <img src="{{ $qrUris[$student->id] ?? '' }}" alt="QR" width="113" height="113">
                                     </div>
                                     <p class="name">{{ $student->name }}</p>
-                                    <p class="major">{{ $student->classroom?->name ?? '—' }}</p>
+                                    <p class="major">{{ $student->classroom ? trim(($student->classroom->grade.' '.$student->classroom->major) ?: $student->classroom->name) : '—' }}</p>
                                 </div>
                             </td>
                         @endforeach
