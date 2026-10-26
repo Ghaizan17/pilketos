@@ -115,7 +115,10 @@ class PrintQrCards extends Page
             return;
         }
 
-        $ids = $this->matchingStudentsQuery()->pluck('students.id')->all();
+        $ids = $this->matchingStudentsQuery()
+            ->orderedForPrinting()
+            ->pluck('students.id')
+            ->all();
 
         $this->jobId = (string) \Illuminate\Support\Str::uuid();
         $this->job = [
@@ -158,11 +161,13 @@ class PrintQrCards extends Page
         }
 
         // Satu tick = cache QR + render 1 part PDF (100 murid, ~3 detik).
+        // Urutan mengikuti $ids (sudah urut kelas) — bukan nama global.
         $students = Student::query()
             ->whereIn('id', $slice)
             ->with('classroom')
-            ->orderBy('name')
-            ->get();
+            ->get()
+            ->sortBy(fn (Student $student): int => array_search($student->id, $slice, true))
+            ->values();
 
         $qrUris = [];
 

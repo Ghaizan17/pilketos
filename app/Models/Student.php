@@ -41,4 +41,19 @@ class Student extends Model
     {
         return $this->hasOne(Vote::class);
     }
+
+    /**
+     * Urutkan untuk cetak: per kelas dulu (X, XI, XII, lalu nama kelas),
+     * di dalam kelas murid tetap urut nama. Grade diurut via posisi
+     * string agar "XII" tidak muncul sebelum "XI" secara alfabetis.
+     */
+    public function scopeOrderedForPrinting(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query
+            ->leftJoin('classrooms', 'classrooms.id', '=', 'students.classroom_id')
+            ->orderByRaw("CASE classrooms.grade WHEN 'X' THEN 1 WHEN 'XI' THEN 2 WHEN 'XII' THEN 3 ELSE 4 END")
+            ->orderBy('classrooms.name')
+            ->orderBy('students.name')
+            ->select(['students.*', 'classrooms.name as classroom_name', 'classrooms.grade as classroom_grade']);
+    }
 }

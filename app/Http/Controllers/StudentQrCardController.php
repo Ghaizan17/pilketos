@@ -54,11 +54,14 @@ class StudentQrCardController extends Controller
         $merger = new \setasign\Fpdi\Fpdi();
 
         foreach (array_chunk($ids, 100) as $chunk) {
+            // Ambil per ID sesuai urutan $ids (sudah urut kelas) — JANGAN
+            // orderBy('name') karena akan mengacak urutan kelas tiap batch.
             $students = Student::query()
                 ->whereIn('id', $chunk)
                 ->with('classroom')
-                ->orderBy('name')
-                ->get();
+                ->get()
+                ->sortBy(fn (Student $student): int => array_search($student->id, $chunk, true))
+                ->values();
 
             $qrUris = [];
 
@@ -98,7 +101,7 @@ class StudentQrCardController extends Controller
     /** Query murid sesuai filter — dipakai hitung/pluck tanpa memuat model. */
     protected function filteredStudentsQuery(Request $request): \Illuminate\Database\Eloquent\Builder
     {
-        $query = Student::query()->orderBy('name');
+        $query = Student::query()->orderedForPrinting();
 
         $scope = (string) $request->query('scope', 'all');
 
