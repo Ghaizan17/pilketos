@@ -1,0 +1,194 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament';
+@source '../../../../resources/views/filament';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Design tokens — modern light admin */
+    --admin-radius: 0.875rem;
+    --admin-active-bg: rgb(79 70 229 / 0.09);
+}
+
+@layer components {
+    /* ---------- Sidebar: clean light, soft active pill ---------- */
+    .fi-sidebar.fi-main-sidebar {
+        background-color: #ffffff;
+        border-right: 1px solid rgb(15 23 42 / 0.08);
+    }
+
+    .fi-sidebar.fi-main-sidebar .fi-sidebar-header {
+        background-color: transparent;
+        padding-block: 1.1rem;
+    }
+
+    .fi-sidebar.fi-main-sidebar .fi-logo {
+        color: #0f172a;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+    }
+
+    .fi-sidebar.fi-main-sidebar .fi-sidebar-group-label {
+        color: #94a3b8;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 700;
+    }
+
+    .fi-sidebar.fi-main-sidebar .fi-sidebar-item-btn {
+        color: #475569;
+        border-radius: var(--admin-radius);
+        font-weight: 500;
+        transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    }
+
+    .fi-sidebar.fi-main-sidebar .fi-sidebar-item-btn > .fi-icon {
+        color: #94a3b8;
+    }
+
+    .fi-sidebar.fi-main-sidebar .fi-sidebar-item-btn:hover {
+        background-color: rgb(15 23 42 / 0.045);
+        color: #0f172a;
+    }
+
+    .fi-sidebar.fi-main-sidebar .fi-sidebar-item-btn:hover > .fi-icon {
+        color: #4f46e5;
+    }
+
+    .fi-sidebar.fi-main-sidebar .fi-active > .fi-sidebar-item-btn {
+        background-color: var(--admin-active-bg);
+        color: #4338ca;
+        font-weight: 700;
+    }
+
+    /* Active icon: gradient tile + white glyph, pops against the soft pill */
+    .fi-sidebar.fi-main-sidebar .fi-active > .fi-sidebar-item-btn > .fi-icon {
+        color: #fff;
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 55%, #0ea5e9 130%);
+        border-radius: 0.625rem;
+        padding: 0.3rem;
+        margin: -0.3rem;
+        box-shadow: 0 4px 10px -2px rgb(79 70 229 / 0.55);
+    }
+
+    /* ---------- Content canvas ---------- */
+    .fi-main-ctn {
+        background-color: #f6f7f9;
+    }
+
+    /* ---------- Page header ---------- */
+    .fi-header-heading {
+        letter-spacing: -0.02em;
+        font-weight: 800;
+    }
+
+    /* ---------- Cards & sections ---------- */
+    .fi-section,
+    .fi-wi-stats-overview-stat,
+    .fi-wi-widget {
+        border-radius: var(--admin-radius);
+    }
+
+    .fi-section {
+        border: 1px solid rgb(15 23 42 / 0.06);
+        box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+    }
+
+    /* ---------- Stats: airy value type ---------- */
+    .fi-wi-stats-overview-stat-value {
+        letter-spacing: -0.02em;
+        font-weight: 800;
+    }
+
+    /* ---------- Table ---------- */
+    .fi-ta-header-cell .fi-ta-header-cell-label {
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #94a3b8;
+    }
+
+    .fi-ta-row {
+        transition: background-color 0.12s ease;
+    }
+
+    /* ---------- Buttons: subtle lift ---------- */
+    .fi-btn {
+        transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease;
+    }
+
+    .fi-btn:not(:disabled):hover {
+        transform: translateY(-1px);
+    }
+
+    .fi-btn:not(:disabled):active {
+        transform: translateY(0);
+    }
+
+    /* ---------- Login ---------- */
+    .fi-simple-page .fi-simple-main {
+        border-radius: 1.25rem;
+        border: 1px solid rgb(15 23 42 / 0.07);
+        box-shadow: 0 24px 48px -16px rgb(49 46 129 / 0.22);
+    }
+
+    /* Login form polish */
+    .fi-simple-page .fi-simple-main .fi-logo {
+        justify-content: center;
+        height: 4.5rem;
+    }
+
+    .fi-simple-page .fi-simple-main .fi-logo img {
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px -8px rgb(15 23 42 / 0.35);
+    }
+
+    .fi-simple-page .fi-simple-header {
+        text-align: center;
+    }
+
+    .fi-simple-page .fi-input {
+        border-radius: 0.75rem;
+    }
+
+    .fi-simple-page .fi-btn.fi-btn-color-primary {
+        border-radius: 0.75rem;
+        font-weight: 700;
+        box-shadow: 0 8px 20px -8px rgb(79 70 229 / 0.6);
+    }
+}
+
+@layer components {
+    /* ---------- Dark mode: defer to Filament defaults with light touches ---------- */
+    .dark .fi-sidebar.fi-main-sidebar {
+        background-color: #0b0f1a;
+        border-right-color: rgb(255 255 255 / 0.07);
+    }
+
+    .dark .fi-sidebar.fi-main-sidebar .fi-logo {
+        color: #f1f5f9;
+    }
+
+    .dark .fi-main-ctn {
+        background-color: #0a0e19;
+    }
+
+    /* Active state stays readable on dark sidebar */
+    .dark .fi-sidebar.fi-main-sidebar .fi-active > .fi-sidebar-item-btn {
+        background-color: rgb(99 102 241 / 0.18);
+        color: #c7d2fe;
+    }
+
+    .dark .fi-sidebar.fi-main-sidebar .fi-active > .fi-sidebar-item-btn > .fi-icon {
+        color: #fff;
+        background: linear-gradient(135deg, #818cf8 0%, #6366f1 55%, #22d3ee 130%);
+        border-radius: 0.625rem;
+        padding: 0.3rem;
+        margin: -0.3rem;
+        box-shadow: 0 4px 12px -2px rgb(99 102 241 / 0.7);
+    }
+}

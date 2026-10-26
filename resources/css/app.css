@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* ---------- Bilik scan: modern animations ---------- */
+@keyframes booth-laser {
+    0%, 100% { top: 8%; opacity: 0; }
+    10% { opacity: 1; }
+    50% { top: 92%; opacity: 1; }
+    60% { opacity: 0; }
+}
+
+@keyframes booth-pulse-ring {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.35); opacity: 0; }
+}
+
+@keyframes booth-toast-in {
+    from { transform: translateX(110%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes booth-toast-progress {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+@keyframes booth-fade-up {
+    from { transform: translateY(14px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.booth-laser {
+    animation: booth-laser 2.6s ease-in-out infinite;
+}
+
+.booth-pulse-ring {
+    animation: booth-pulse-ring 1.8s ease-out infinite;
+}
+
+.booth-toast {
+    animation: booth-toast-in 0.35s cubic-bezier(0.21, 1.02, 0.73, 1) both;
+}
+
+.booth-toast-progress {
+    animation: booth-toast-progress 3s linear forwards;
+}
+
+.booth-fade-up {
+    animation: booth-fade-up 0.4s cubic-bezier(0.21, 1.02, 0.73, 1) both;
+}
