@@ -8,9 +8,9 @@
 </head>
 <body class="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
 <div class="mx-auto flex min-h-screen w-full max-w-sm flex-col items-center justify-center px-4 py-10">
-    <img src="{{ asset('images/logo-smkn2.png') }}" alt="Logo SMKN 2 Banjarmasin" class="h-20 w-20 rounded-3xl object-cover shadow-lg shadow-indigo-600/20 ring-1 ring-slate-900/10">
+    <img src="{{ asset('images/logo-smkn2.png') }}" alt="Logo SMKN 2 Banjarmasin" class="h-24 w-24 object-cover">
     <h1 class="mt-4 text-2xl font-black tracking-tight">Login Bilik Suara</h1>
-    <p class="mt-1 text-sm text-slate-500">Masuk sebagai operator bilik untuk membuka scanner.</p>
+    <p class="mt-1 text-sm text-center text-slate-500">Masuk sebagai operator bilik untuk membuka scanner.</p>
 
     <form method="POST" action="{{ route('booth.login.attempt') }}" class="mt-6 w-full rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5">
         @csrf
@@ -22,7 +22,7 @@
         <label for="username" class="text-sm font-semibold">Username</label>
         <input
             id="username" name="username" type="text" required autofocus autocomplete="username"
-            value="{{ old('username') }}" placeholder="cth. operatorscan"
+            value="{{ old('username') }}" placeholder="Masukkan Username Anda"
             class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
         >
 

@@ -10,7 +10,7 @@
 <div class="mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center px-4 py-10">
     {{-- Brand --}}
     <header class="flex flex-col items-center text-center">
-        <img src="{{ asset('images/logo-smkn2.png') }}" alt="Logo SMKN 2 Banjarmasin" class="h-24 w-24 rounded-3xl object-cover shadow-xl shadow-indigo-600/20 ring-1 ring-slate-900/10">
+        <img src="{{ asset('images/logo-smkn2.png') }}" alt="Logo SMKN 2 Banjarmasin" class="h-24 w-24 object-cover">
         <p class="mt-4 text-xs font-bold uppercase tracking-[0.3em] text-indigo-600">SMKN 2 Banjarmasin</p>
         <h1 class="mt-1 text-4xl font-black tracking-tight">PILKETOS</h1>
         <p class="mt-1 text-sm text-slate-500">Pemilihan Ketua &amp; Wakil Ketua OSIS</p>
@@ -23,7 +23,7 @@
 
     {{-- Kandidat --}}
     <h2 class="mt-10 text-sm font-bold uppercase tracking-widest text-slate-400">Pasangan Calon</h2>
-    <div class="mt-4 grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="mt-4 grid w-full grid-cols-1 gap-4 md:flex md:justify-center">
         @foreach ($candidates as $candidate)
             <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
                 @if ($candidate->photo_path)
