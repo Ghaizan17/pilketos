@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login Bilik — Pilketos SMKN 2 Banjarmasin</title>
+    @vite(['resources/css/app.css'])
+</head>
+<body class="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
+<div class="mx-auto flex min-h-screen w-full max-w-sm flex-col items-center justify-center px-4 py-10">
+    <img src="{{ asset('images/logo-smkn2.png') }}" alt="Logo SMKN 2 Banjarmasin" class="h-20 w-20 rounded-3xl object-cover shadow-lg shadow-indigo-600/20 ring-1 ring-slate-900/10">
+    <h1 class="mt-4 text-2xl font-black tracking-tight">Login Bilik Suara</h1>
+    <p class="mt-1 text-sm text-slate-500">Masuk sebagai operator bilik untuk membuka scanner.</p>
+
+    <form method="POST" action="{{ route('booth.login.attempt') }}" class="mt-6 w-full rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5">
+        @csrf
+
+        @if ($errors->any())
+            <p class="mb-4 rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-600 ring-1 ring-red-200">{{ $errors->first() }}</p>
+        @endif
+
+        <label for="username" class="text-sm font-semibold">Username</label>
+        <input
+            id="username" name="username" type="text" required autofocus autocomplete="username"
+            value="{{ old('username') }}" placeholder="cth. operatorscan"
+            class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+        >
+
+        <label for="password" class="mt-4 block text-sm font-semibold">Password</label>
+        <input
+            id="password" name="password" type="password" required autocomplete="current-password"
+            class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+        >
+
+        <label class="mt-4 flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+            <input type="checkbox" name="remember" value="1" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+            Ingat saya
+        </label>
+
+        <button type="submit" class="mt-5 w-full rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition hover:scale-[1.01] active:scale-[0.99]">
+            Masuk
+        </button>
+    </form>
+
+    <a href="{{ route('home') }}" class="mt-6 text-xs font-semibold text-slate-500 hover:text-indigo-600">← Kembali ke beranda</a>
+</div>
+</body>
+</html>

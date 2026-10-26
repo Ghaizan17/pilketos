@@ -26,6 +26,16 @@ class AdminUserSeeder extends Seeder
             ],
         );
 
+        User::updateOrCreate(
+            ['username' => 'operatorscan'],
+            [
+                'name' => 'Operator Scan Bilik',
+                'email' => 'scan@pilketos.local',
+                'password' => 'operatorscan123',
+            ],
+        );
+
         $this->command?->info('Admin login: operatorskenda / operatorskenda123 (change after first login).');
+        $this->command?->info('Booth login: operatorscan / operatorscan123 (change after first login).');
     }
 }

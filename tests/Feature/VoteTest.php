@@ -25,6 +25,12 @@ class VoteTest extends TestCase
     /**
      * @return array{0: Student, 1: Candidate}
      */
+    private function loginBooth(): void
+    {
+        $user = \App\Models\User::factory()->create();
+        $this->actingAs($user);
+    }
+
     private function fixtures(): array
     {
         $classroom = Classroom::create(['name' => 'XII RPL A', 'grade' => 'XII', 'major' => 'RPL A']);
@@ -45,6 +51,7 @@ class VoteTest extends TestCase
     public function test_vote_success_returns_201_and_counts_once(): void
     {
         [$student, $candidate] = $this->fixtures();
+        $this->loginBooth();
 
         $this->getJson('/api/voters/'.$student->uuid)
             ->assertOk()
@@ -63,6 +70,7 @@ class VoteTest extends TestCase
     public function test_second_vote_same_uuid_returns_409_and_count_stays_1(): void
     {
         [$student, $candidate] = $this->fixtures();
+        $this->loginBooth();
 
         $this->postJson('/api/votes', [
             'student_uuid' => $student->uuid,
@@ -82,6 +90,7 @@ class VoteTest extends TestCase
     public function test_unknown_uuid_returns_404(): void
     {
         [, $candidate] = $this->fixtures();
+        $this->loginBooth();
 
         $this->getJson('/api/voters/'.(string) Str::uuid())
             ->assertNotFound()
@@ -98,6 +107,7 @@ class VoteTest extends TestCase
     public function test_closed_election_returns_403_on_both_endpoints(): void
     {
         [$student, $candidate] = $this->fixtures();
+        $this->loginBooth();
 
         ElectionSetting::where('key', 'is_open')->update(['value' => 'false']);
 

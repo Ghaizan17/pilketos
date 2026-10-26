@@ -12,6 +12,15 @@
     x-data="booth({ closed: {{ $isOpen ? 'false' : 'true' }}, candidates: {{ Js::from($candidatesPayload) }} })"
     class="mx-auto flex min-h-screen w-full max-w-xl flex-col items-center px-4 py-8"
 >
+    <div class="flex w-full items-center justify-between">
+        <a href="{{ route('home') }}" class="text-xs font-semibold text-slate-500 hover:text-indigo-600">← Beranda</a>
+        <form method="POST" action="{{ route('booth.logout') }}">
+            @csrf
+            <button type="submit" class="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50">
+                Keluar ({{ auth()->user()?->username }})
+            </button>
+        </form>
+    </div>
     {{-- Brand --}}
     <header class="booth-fade-up flex flex-col items-center text-center">
         <img src="{{ asset('images/logo-smkn2.png') }}" alt="Logo SMKN 2 Banjarmasin" class="h-20 w-20 object-cover">
