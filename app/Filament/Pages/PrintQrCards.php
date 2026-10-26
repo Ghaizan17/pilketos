@@ -14,7 +14,7 @@ use Filament\Schemas\Components\Form;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
+use setasign\Fpdi\Fpdi;
 
 /**
  * Cetak kartu QR murid ke PDF (kecil, 20 kartu per halaman A4).
@@ -225,24 +225,21 @@ class PrintQrCards extends Page
             return;
         }
 
-        $gs = trim((string) shell_exec('command -v gs'));
+        // Gabung murni-PHP via FPDI+FPDF — tanpa Ghostscript di server.
+        $merger = new Fpdi();
 
-        if ($gs === '') {
-            // Tanpa Ghostscript: gabung tidak tersedia — pakai bagian pertama saja.
-            throw new \RuntimeException('PDF terlalu besar dan Ghostscript tidak tersedia di server.');
+        foreach ($parts as $part) {
+            $count = $merger->setSourceFile(Storage::path("qr-pdf/{$part}"));
+
+            for ($page = 1; $page <= $count; $page++) {
+                $tpl = $merger->importPage($page);
+                $size = $merger->getTemplateSize($tpl);
+                $merger->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                $merger->useTemplate($tpl);
+            }
         }
 
-        $inputs = implode(' ', array_map(
-            fn (string $p): string => escapeshellarg(Storage::path("qr-pdf/{$p}")),
-            $parts
-        ));
-        $output = escapeshellarg(Storage::path("qr-pdf/{$filename}"));
-        $cmd = "{$gs} -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile={$output} {$inputs} 2>&1";
-        $result = shell_exec($cmd);
-
-        if (! $disk->exists("qr-pdf/{$filename}")) {
-            throw new \RuntimeException('Penggabungan PDF gagal: '.(string) $result);
-        }
+        $disk->put("qr-pdf/{$filename}", $merger->Output('S'));
     }
 
     public function resetJob(): mixed

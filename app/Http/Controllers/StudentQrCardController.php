@@ -40,25 +40,73 @@ class StudentQrCardController extends Controller
     public function pdf(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         set_time_limit(300);
-        ini_set('memory_limit', '512M');
 
-        $students = $this->filteredStudents($request);
+        $scopeLabel = $this->scopeLabel($request);
 
-        // Cache SVG per murid (UUID tidak pernah berubah) agar unduhan
-        // berikutnya jauh lebih cepat.
-        $qrUris = [];
+        // Render bertahap per 100 murid lalu gabung murni-PHP (FPDI),
+        // agar "semua murid" (ribuan kartu) tidak meledak di memori.
+        $ids = $this->filteredStudentsQuery($request)->pluck('students.id')->all();
 
-        foreach ($students as $student) {
-            $qrUris[$student->id] = $this->qrDataUri($student);
+        if ($ids === []) {
+            abort(404, 'Tidak ada murid pada cakupan ini.');
         }
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('students.qr-cards-pdf', [
-            'students' => $students,
-            'scopeLabel' => $this->scopeLabel($request),
-            'qrUris' => $qrUris,
-        ])->setPaper('a4', 'portrait');
+        $merger = new \setasign\Fpdi\Fpdi();
 
-        return $pdf->download('kartu-qr-'.$this->scopeSlug($request).'.pdf');
+        foreach (array_chunk($ids, 100) as $chunk) {
+            $students = Student::query()
+                ->whereIn('id', $chunk)
+                ->with('classroom')
+                ->orderBy('name')
+                ->get();
+
+            $qrUris = [];
+
+            foreach ($students as $student) {
+                $qrUris[$student->id] = $this->qrDataUri($student);
+            }
+
+            $part = \Barryvdh\DomPDF\Facade\Pdf::loadView('students.qr-cards-pdf', [
+                'students' => $students,
+                'scopeLabel' => $scopeLabel,
+                'qrUris' => $qrUris,
+            ])->setPaper('a4', 'portrait')->output();
+
+            $tmp = tempnam(sys_get_temp_dir(), 'qr-part-').'.pdf';
+            file_put_contents($tmp, $part);
+            unset($part);
+
+            $count = $merger->setSourceFile($tmp);
+
+            for ($page = 1; $page <= $count; $page++) {
+                $tpl = $merger->importPage($page);
+                $size = $merger->getTemplateSize($tpl);
+                $merger->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                $merger->useTemplate($tpl);
+            }
+
+            @unlink($tmp);
+            unset($students, $qrUris);
+        }
+
+        return response($merger->Output('S'), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="kartu-qr-'.$this->scopeSlug($request).'.pdf"',
+        ]);
+    }
+
+    /** Query murid sesuai filter — dipakai hitung/pluck tanpa memuat model. */
+    protected function filteredStudentsQuery(Request $request): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = Student::query()->orderBy('name');
+
+        $scope = (string) $request->query('scope', 'all');
+
+        if ($scope === 'classroom' && $request->filled('classroom_id')) {
+            $query->where('classroom_id', $request->query('classroom_id'));
+        }
+
+        return $query;
     }
 
     /**
@@ -100,20 +148,6 @@ class StudentQrCardController extends Controller
         }
 
         return 'data:image/svg+xml;base64,'.base64_encode((string) \Illuminate\Support\Facades\Storage::disk('local')->get($key));
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\Student> */
-    public function filteredStudents(Request $request): \Illuminate\Database\Eloquent\Collection
-    {
-        $query = \App\Models\Student::query()->with('classroom')->orderBy('name');
-
-        $scope = (string) $request->query('scope', 'all');
-
-        if ($scope === 'classroom' && $request->filled('classroom_id')) {
-            $query->where('classroom_id', $request->query('classroom_id'));
-        }
-
-        return $query->get();
     }
 
     protected function scopeLabel(Request $request): string
