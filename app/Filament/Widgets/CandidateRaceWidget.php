@@ -10,7 +10,7 @@ class CandidateRaceWidget extends Widget
 {
     protected string $view = 'filament.widgets.candidate-race';
 
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 2;
 
     protected int | string | array $columnSpan = 'full';
 

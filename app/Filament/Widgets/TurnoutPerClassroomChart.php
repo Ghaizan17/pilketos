@@ -11,6 +11,8 @@ class TurnoutPerClassroomChart extends ChartWidget
 
     protected ?string $pollingInterval = '5s';
 
+    protected static ?int $sort = 3;
+
     protected int | string | array $columnSpan = 'full';
 
     protected function getType(): string
