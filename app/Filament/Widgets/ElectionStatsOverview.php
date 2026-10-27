@@ -12,7 +12,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class ElectionStatsOverview extends StatsOverviewWidget
 {
-    protected ?string $pollingInterval = '5s';
+    protected ?string $pollingInterval = '15s';
 
     protected function getStats(): array
     {

@@ -11,7 +11,7 @@ class VotesPerCandidateStats extends StatsOverviewWidget
 {
     protected ?string $heading = 'Suara Tiap Paslon';
 
-    protected ?string $pollingInterval = '5s';
+    protected ?string $pollingInterval = '15s';
 
     protected int | string | array $columnSpan = 1;
 

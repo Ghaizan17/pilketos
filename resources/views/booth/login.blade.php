@@ -12,7 +12,7 @@
 <div aria-hidden="true" class="pointer-events-none absolute top-40 -right-32 h-96 w-96 rounded-full bg-cyan-300/40 blur-3xl booth-blob" style="animation-delay:-3.5s"></div>
 <div class="relative mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center px-4 py-10 sm:max-w-lg sm:py-14">
     <div class="booth-fade-up w-full rounded-[2rem] border border-white/60 bg-white/80 p-8 text-center shadow-xl shadow-indigo-600/10 backdrop-blur sm:p-10" style="animation-delay:.08s">
-        <img src="{{ asset('images/logo-smkn2.png') }}" alt="Logo SMKN 2 Banjarmasin" class="mx-auto h-20 w-20 object-cover">
+        <img src="{{ asset('images/logo-smkn2-192.webp') }}" width="192" height="192" fetchpriority="high" alt="Logo SMKN 2 Banjarmasin" class="mx-auto h-20 w-20 object-cover">
         <p class="mt-4 text-xs font-bold uppercase tracking-[0.3em] text-indigo-600">SMKN 2 Banjarmasin</p>
         <h1 class="mt-2 bg-gradient-to-r from-indigo-600 to-cyan-500 bg-clip-text text-3xl font-black tracking-tight text-transparent sm:text-4xl">Login Bilik Suara</h1>
         <p class="mt-2 text-sm text-slate-500">Masuk sebagai operator bilik untuk membuka scanner.</p>

@@ -9,7 +9,7 @@ class VotesPerCandidateChart extends ChartWidget
 {
     protected ?string $heading = 'Suara per Paslon';
 
-    protected ?string $pollingInterval = '5s';
+    protected ?string $pollingInterval = '15s';
 
     // Tanpa aspect-ratio: Chart.js responsif penuh mengikuti tinggi wadah grid,
     // agar sejajar dengan tumpukan card di kanan. Tinggi min menjaga pie tetap lega.

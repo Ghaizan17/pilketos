@@ -9,7 +9,7 @@ class TurnoutPerClassroomChart extends ChartWidget
 {
     protected ?string $heading = 'Partisipasi per Kelas';
 
-    protected ?string $pollingInterval = '5s';
+    protected ?string $pollingInterval = '15s';
 
     protected static ?int $sort = 3;
 

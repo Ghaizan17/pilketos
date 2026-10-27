@@ -31,9 +31,9 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName('Pilketos · SMKN 2 Banjarmasin')
-            ->brandLogo(asset('images/logo-smkn2.png'))
+            ->brandLogo(asset('images/logo-smkn2-192.webp'))
             ->brandLogoHeight('2.5rem')
-            ->darkModeBrandLogo(asset('images/logo-smkn2.png'))
+            ->darkModeBrandLogo(asset('images/logo-smkn2-192.webp'))
             ->favicon(asset('images/logo-smkn2.png'))
             ->simplePageMaxContentWidth('md')
             ->navigationGroups([

@@ -7,7 +7,7 @@
             @forelse ($rows as $row)
                 <div class="flex items-center gap-4">
                     @if ($row['photo'])
-                        <img src="{{ $row['photo'] }}" alt="Paslon No. {{ $row['number'] }}"
+                        <img src="{{ $row['photo'] }}" alt="Paslon No. {{ $row['number'] }}" width="96" height="112" loading="lazy"
                             class="h-28 w-24 shrink-0 rounded-xl object-cover object-top ring-1 ring-slate-200">
                     @else
                         <div class="flex h-28 w-24 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-3xl font-black text-slate-300 ring-1 ring-slate-200">

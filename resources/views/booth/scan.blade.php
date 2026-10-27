@@ -24,7 +24,7 @@
     </div> -->
     {{-- Brand --}}
     <header class="booth-fade-up flex flex-col items-center text-center">
-        <img src="{{ asset('images/logo-smkn2.png') }}" alt="Logo SMKN 2 Banjarmasin" class="h-20 w-20 object-cover">
+        <img src="{{ asset('images/logo-smkn2-192.webp') }}" width="192" height="192" fetchpriority="high" alt="Logo SMKN 2 Banjarmasin" class="h-20 w-20 object-cover">
         <p class="mt-3 text-xs font-bold uppercase tracking-[0.3em] text-indigo-600">SMKN 2 Banjarmasin</p>
         <h1 class="mt-1 text-3xl font-black tracking-tight text-slate-900">PILKETOS</h1>
         <p class="mt-1 text-sm text-slate-500">Pemilihan Ketua &amp; Wakil Ketua OSIS</p>
