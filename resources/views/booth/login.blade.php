@@ -7,6 +7,13 @@
     <link rel="icon" href="{{ asset('images/logo-smkn2.png') }}">
     @vite(['resources/css/app.css'])
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <style>
+        .swal2-popup.swal2-toast { background: #fff !important; color: #0f172a !important; border-radius: 1rem !important; border: 1px solid rgb(15 23 42 / 0.08) !important; box-shadow: 0 24px 48px -16px rgb(15 23 42 / 0.25) !important; }
+        .swal2-toast .swal2-title { color: #0f172a !important; }
+        .swal2-toast .swal2-html-container { color: #64748b !important; }
+        .swal2-toast .swal2-close { color: #94a3b8 !important; }
+        .swal2-toast .swal2-timer-progress-bar { background: #ef4444 !important; }
+    </style>
 </head>
 <body class="relative min-h-screen overflow-x-hidden bg-slate-100 font-sans text-slate-900 antialiased">
 <div aria-hidden="true" class="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-indigo-300/40 blur-3xl booth-blob"></div>
@@ -84,8 +91,9 @@
         var errorEl = document.getElementById('login-error');
         var Toast = Swal.mixin({
             toast: true,
-            position: 'top',
+            position: 'top-end',
             showConfirmButton: false,
+            showCloseButton: true,
             timerProgressBar: true,
             didOpen: function (toast) {
                 toast.addEventListener('mouseenter', Swal.stopTimer);
