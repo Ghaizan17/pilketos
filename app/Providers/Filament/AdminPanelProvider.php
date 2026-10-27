@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\CandidateRaceWidget;
 use App\Filament\Widgets\ElectionStatsOverview;
 use App\Filament\Widgets\TurnoutPerClassroomChart;
 use App\Filament\Widgets\VotesPerCandidateChart;
@@ -54,6 +55,7 @@ class AdminPanelProvider extends PanelProvider
                 ElectionStatsOverview::class,
                 VotesPerCandidateChart::class,
                 VotesPerCandidateStats::class,
+                CandidateRaceWidget::class,
                 TurnoutPerClassroomChart::class,
             ])
             ->middleware([
