@@ -114,23 +114,23 @@
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-            class="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-8"
+            class="max-h-[95vh] w-full max-w-6xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-4 shadow-2xl sm:p-5"
         >
-            <div class="flex items-center gap-4">
-                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl ring-1"
+            <div class="flex items-center gap-3">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ring-1"
                     :class="(student?.jk ?? 'L') === 'P' ? 'bg-pink-50 ring-pink-200' : 'bg-blue-50 ring-blue-200'">
-                    <iconify-icon icon="mdi:account" width="40" height="40"
+                    <iconify-icon icon="mdi:account" width="30" height="30"
                         :style="{ color: (student?.jk ?? 'L') === 'P' ? '#ec4899' : '#2563eb' }"></iconify-icon>
                 </div>
                 <div>
-                    <p class="text-xs uppercase tracking-widest text-slate-400">Pemilih</p>
-                    <h2 class="text-xl font-bold text-slate-900 sm:text-2xl" x-text="student?.name"></h2>
-                    <p class="text-sm text-slate-500" x-text="student?.classroom ?? ''"></p>
+                    <p class="text-[11px] uppercase tracking-widest text-slate-400">Pemilih</p>
+                    <h2 class="text-lg font-bold text-slate-900" x-text="student?.name"></h2>
+                    <p class="text-xs text-slate-500" x-text="student?.classroom ?? ''"></p>
                 </div>
             </div>
 
-            <p class="mt-5 text-base font-semibold text-slate-700">Pilih salah satu paslon:</p>
-            <div class="mt-4 grid gap-4 sm:gap-5" :class="candidates.length === 2 ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'">
+            <p class="mt-3 text-base font-semibold text-slate-700">Pilih salah satu paslon:</p>
+            <div class="mt-3 grid gap-4 sm:gap-5" :class="candidates.length === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'">
                 <template x-for="c in candidates" :key="c.id">
                     <button
                         type="button"
@@ -142,10 +142,10 @@
                     >
                         <div class="relative leading-[0]">
                             <template x-if="c.photo">
-                                <img :src="c.photo" :alt="'Paslon No. ' + c.number" class="block aspect-[3/4] w-full object-cover">
+                                <img :src="c.photo" :alt="'Paslon No. ' + c.number" class="block aspect-[16/9] w-full object-cover object-top">
                             </template>
                             <template x-if="!c.photo">
-                                <div class="flex aspect-[3/4] w-full items-center justify-center bg-slate-100">
+                                <div class="flex aspect-[16/9] w-full items-center justify-center bg-slate-100">
                                     <span class="text-7xl font-black text-slate-300" x-text="c.number"></span>
                                 </div>
                             </template>
@@ -154,9 +154,9 @@
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                             </span>
                         </div>
-                        <div class="p-4 leading-normal">
+                        <div class="p-3 leading-normal">
                             <p class="text-base font-bold text-slate-900" x-text="c.ketua + ' & ' + c.wakil"></p>
-                            <p class="mt-1 text-sm italic text-slate-500" x-show="c.tagline" x-text="c.tagline"></p>
+                            <p class="mt-0.5 text-sm italic text-slate-500" x-show="c.tagline" x-text="c.tagline"></p>
                         </div>
                     </button>
                 </template>
