@@ -34,6 +34,7 @@ class VoterController extends Controller
                 'uuid' => $student->uuid,
                 'name' => $student->name,
                 'classroom' => $student->classroom?->name,
+                'jk' => $student->jk,
             ],
         ]);
     }

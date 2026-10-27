@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Bilik Suara — Pilketos SMKN 2 Banjarmasin</title>
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/booth.js'])
 </head>
 <body class="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
@@ -113,14 +114,18 @@
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-            class="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl"
+            class="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl sm:p-8"
         >
-            <div class="flex items-center gap-3">
-                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-500 text-lg font-black text-white" x-text="voterInitial()"></div>
+            <div class="flex items-center gap-4">
+                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl ring-1"
+                    :class="(student?.jk ?? 'L') === 'P' ? 'bg-pink-50 ring-pink-200' : 'bg-blue-50 ring-blue-200'">
+                    <iconify-icon icon="mdi:account" width="40" height="40"
+                        :style="{ color: (student?.jk ?? 'L') === 'P' ? '#ec4899' : '#2563eb' }"></iconify-icon>
+                </div>
                 <div>
                     <p class="text-xs uppercase tracking-widest text-slate-400">Pemilih</p>
-                    <h2 class="text-lg font-bold text-slate-900" x-text="student?.name"></h2>
-                    <p class="text-xs text-slate-500" x-text="student?.classroom ?? ''"></p>
+                    <h2 class="text-xl font-bold text-slate-900 sm:text-2xl" x-text="student?.name"></h2>
+                    <p class="text-sm text-slate-500" x-text="student?.classroom ?? ''"></p>
                 </div>
             </div>
 
