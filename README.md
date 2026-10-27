@@ -1,58 +1,110 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Pilketos — SMKN 2 Banjarmasin
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi voting Ketua & Wakil Ketua OSIS berbasis **QR code sekali pakai**.
+Setiap murid mendapat kartu QR pribadi; operator bilik memindai QR untuk membuka
+halaman pilihan, murid memilih satu paslon lalu mengunci pilihannya.
+Satu QR hanya berlaku untuk satu suara.
 
-## About Laravel
+Stack: Laravel 13 + Filament 5 (panel admin) + SQLite + Tailwind 4 + Alpine.js
++ zxing-wasm (scan QR via kamera) + DomPDF/FPDI (cetak kartu QR).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Alur pemakaian
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Persiapan (panitia / operator)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. Buka panel admin di `/admin` dan login sebagai operator.
+2. **Import Murid** — unggah file Excel Dapodik
+   (`daftar_pd-*.xlsx`, data mulai baris 7; kolom Nama, NIPD, JK, NISN, Rombel
+   terdeteksi otomatis). Setiap murid otomatis mendapat UUID untuk QR-nya.
+3. **Kandidat** — tambah paslon (nomor urut, nama ketua & wakil, tagline, foto).
+4. **Cetak QR** — unduh kartu QR massal (`/students/qr-cards.pdf`, 4 kartu
+   per halaman A4) atau per murid langsung dari tabel Murid
+   (tombol *Cetak QR* → file PDF terunduh otomatis).
+5. **Pemilihan** — buka/tutup pemilihan dari halaman Pengaturan Pemilihan.
+   Saat ditutup, `/bilik` menampilkan status "Pemilihan Ditutup".
 
-## Learning Laravel
+### Hari-H (bilik suara)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Operator login di `/login` (username + password + tombol show/hide password).
+2. Buka `/bilik` — arahkan QR murid ke bingkai kamera (otomatis terdeteksi).
+3. Modal **Pilih Paslon** muncul (2 paslon tampil kiri-kanan, foto memenuhi
+   kartu). Pilih satu paslon → **Pilih Paslon Ini** → popup **Kunci pilihan?**
+   → **Ya, Konfirmasi**.
+4. Suara tercatat → bunyi sukses + toast hijau → kembali ke mode scan.
+   QR salah menampilkan modal *QR Tidak Dikenal*; QR yang sudah dipakai
+   menampilkan *Sudah Memilih*.
+5. Keluar via tombol *Keluar* (atau POST `/keluar`).
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Peran pengguna
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+| Role | Login | Akses |
+| --- | --- | --- |
+| `operator` | `/admin/login` dan `/login` | Penuh: panel admin, cetak QR, bilik scan |
+| `scanner` | `/login` saja | Hanya `/bilik` (ditolak di `/admin` dan unduhan QR dengan 403) |
 
-## Agentic Development
+Akun bawaan (ganti password setelah login pertama):
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+| Username | Password | Role |
+| --- | --- | --- |
+| `operatorskenda` | `operatorskenda123` | operator |
+| `operatorscan` | `operatorscan123` | scanner |
+
+## Menjalankan secara lokal
+
+Syarat: PHP 8.4 + Composer + Node 24. Ekstensi PHP: `sqlite3/pdo_sqlite`,
+`gd`, `mbstring`, `xml`, `fileinfo`, `zip` (untuk import Excel).
 
 ```bash
-composer require laravel/boost --dev
+# 1. Dependensi
+composer install
+npm install
 
-php artisan boost:install
+# 2. Konfigurasi
+cp .env.example .env
+php artisan key:generate
+# DB default SQLite — pastikan database/database.sqlite ada:
+touch database/database.sqlite
+
+# 3. Migrasi + data awal (2 akun + pemilihan terbuka + data demo)
+php artisan migrate --seed
+
+# 4. Build aset frontend
+npm run build
+
+# 5. Jalankan
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Buka `http://127.0.0.1:8000` (halaman utama), `/admin` (panel admin),
+`/login` (login bilik), `/bilik` (scan — butuh login + kamera/HTTPS).
 
-## Contributing
+Perintah berguna:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan test                    # seluruh test (19 test)
+php artisan test --filter=BoothAuthTest
+npm run dev                         # dev server Vite (hot reload)
+php artisan pilketos:clear-demo     # hapus data demo (nipd DEMO*)
+```
 
-## Code of Conduct
+## Struktur penting
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- `routes/web.php` — `/`, `/login`, `/bilik`, `/api/voters|votes`, cetak QR.
+- `app/Filament/` — panel admin: Resources (Murid, Kandidat, User, Suara),
+  Pages (Import Murid, Cetak QR, Pengaturan Pemilihan), Widgets dashboard.
+- `resources/views/booth/` — `home.blade.php`, `login.blade.php`, `scan.blade.php`.
+- `resources/js/booth.js` — state machine bilik
+  (`scanning → resolving → selecting → confirm_popup → confirming`,
+  error: `unknown_qr | already_voted | camera_error`) + audio sukses.
+- `resources/views/students/qr-*.blade.php` — template kartu QR
+  (massal A4 + perorangan, QR sebagai data-URI SVG agar lolos DomPDF).
+- `public/sounds/vote-success.mp3` — audio saat suara tercatat.
 
-## Security Vulnerabilities
+## Catatan operasional
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Bilik butuh kamera + konteks aman (HTTPS atau `localhost`) agar
+  `getUserMedia` diizinkan browser.
+- Foto paslon di modal memakai `object-top` — wajah tetap terlihat pada
+  crop landscape.
+- Import massal menampilkan overlay error generik berbahasa Inggris bila
+  server kehabisan memori/waktu — lihat `storage/logs/laravel.log`.
