@@ -21,7 +21,7 @@
             @csrf
 
             @if ($errors->any())
-                <p class="mb-4 rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-600 ring-1 ring-red-200">{{ $errors->first() }}</p>
+                <p id="login-error" class="hidden">{{ $errors->first() }}</p>
             @endif
 
             <label for="username" class="text-sm font-semibold">Username</label>
@@ -62,8 +62,8 @@
             <svg class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01" /></svg>
         </div>
         <div class="min-w-0">
-            <p class="text-sm font-bold text-slate-900">Terlalu banyak percobaan</p>
-            <p class="text-xs text-slate-500">Tunggu <span id="login-toast-count">3</span> detik sebelum mencoba lagi.</p>
+            <p id="login-toast-title" class="text-sm font-bold text-slate-900">Login gagal</p>
+            <p id="login-toast-body" class="text-xs text-slate-500">Username atau password salah.</p>
         </div>
     </div>
 </div>
@@ -83,17 +83,30 @@
         var FAILS_KEY = 'pilketos-login-fails';
         var LOCK_KEY = 'pilketos-login-locked-until';
         var fails = parseInt(sessionStorage.getItem(FAILS_KEY) || '0', 10) || 0;
-        // Redirect balik dengan blok error = 1 kegagalan.
-        if (document.querySelector('.bg-red-50')) {
+        var submit = document.getElementById('login-submit');
+        var toast = document.getElementById('login-toast');
+        var titleEl = document.getElementById('login-toast-title');
+        var bodyEl = document.getElementById('login-toast-body');
+        var errorEl = document.getElementById('login-error');
+        // Redirect balik dengan error = 1 kegagalan.
+        if (errorEl) {
             fails += 1;
             sessionStorage.setItem(FAILS_KEY, String(fails));
         }
-        var submit = document.getElementById('login-submit');
-        var toast = document.getElementById('login-toast');
-        var countEl = document.getElementById('login-toast-count');
+        function hideToast() {
+            toast.classList.add('hidden');
+        }
+        function showToast(title, bodyHtml, autoHideMs) {
+            titleEl.textContent = title;
+            bodyEl.innerHTML = bodyHtml;
+            toast.classList.remove('hidden');
+            if (autoHideMs) {
+                setTimeout(hideToast, autoHideMs);
+            }
+        }
         function unlock() {
             submit.disabled = false;
-            toast.classList.add('hidden');
+            hideToast();
             sessionStorage.setItem(FAILS_KEY, '0');
             sessionStorage.removeItem(LOCK_KEY);
         }
@@ -101,8 +114,7 @@
             var until = Date.now() + seconds * 1000;
             sessionStorage.setItem(LOCK_KEY, String(until));
             submit.disabled = true;
-            toast.classList.remove('hidden');
-            countEl.textContent = String(seconds);
+            showToast('Terlalu banyak percobaan', 'Tunggu <span id="login-toast-count">' + seconds + '</span> detik sebelum mencoba lagi.');
             var left = seconds;
             var timer = setInterval(function () {
                 left -= 1;
@@ -110,7 +122,8 @@
                     clearInterval(timer);
                     unlock();
                 } else {
-                    countEl.textContent = String(left);
+                    var countEl = document.getElementById('login-toast-count');
+                    if (countEl) countEl.textContent = String(left);
                 }
             }, 1000);
         }
@@ -122,6 +135,9 @@
             unlock();
         } else if (fails >= 3) {
             lock(3);
+        } else if (errorEl) {
+            // Salah ke-1/2: tampilkan pesan error sebagai toast yang hilang sendiri.
+            showToast('Login gagal', errorEl.textContent.trim() || 'Username atau password salah.', 4000);
         }
     })();
 </script>
