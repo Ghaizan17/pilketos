@@ -17,12 +17,12 @@
 
                     <div class="min-w-0 flex-1">
                         <div class="flex items-baseline justify-between gap-2">
-                            <p class="truncate text-sm font-bold text-slate-900">
+                            <p class="truncate text-sm font-bold text-slate-900 dark:text-white">
                                 <span class="mr-1.5 rounded-full px-2 py-0.5 text-xs font-black text-white" style="background-color: {{ $row['color'] }}">No. {{ $row['number'] }}</span>{{ $row['names'] }}
                             </p>
-                            <p class="shrink-0 text-sm font-black text-slate-900">{{ number_format($row['votes']) }} <span class="text-xs font-medium text-slate-400">suara</span></p>
+                            <p class="shrink-0 text-sm font-black text-slate-900 dark:text-white">{{ number_format($row['votes']) }} <span class="text-xs font-medium text-slate-400">suara</span></p>
                         </div>
-                        <div class="mt-1.5 h-3 overflow-hidden rounded-full bg-slate-100">
+                        <div class="mt-1.5 h-3 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
                             <div class="h-full rounded-full transition-all duration-500" style="width: {{ $row['percent'] }}%; background-color: {{ $row['color'] }}"></div>
                         </div>
                         @if ($row['tagline'])
