@@ -48,7 +48,7 @@
                 Ingat saya
             </label>
 
-            <button type="submit" class="mt-5 w-full rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-500 px-6 py-4 text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition hover:scale-[1.01] active:scale-[0.99]">
+            <button type="submit" id="login-submit" class="mt-5 w-full rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-500 px-6 py-4 text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100">
                 Masuk
             </button>
             <p class="mt-3 text-center text-xs text-slate-400">Gunakan akun operator yang diberikan panitia.</p>
@@ -56,6 +56,17 @@
     </div>
 
     <a href="{{ route('home') }}" class="mt-6 text-xs font-semibold text-slate-500 hover:text-indigo-600">← Kembali ke beranda</a>
+<div id="login-toast" class="pointer-events-none fixed left-1/2 top-4 z-50 hidden w-[calc(100%-2rem)] max-w-sm -translate-x-1/2" role="alert">
+    <div class="flex items-start gap-3 rounded-2xl border border-red-200 bg-white p-4 shadow-2xl">
+        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100">
+            <svg class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01" /></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-bold text-slate-900">Terlalu banyak percobaan</p>
+            <p class="text-xs text-slate-500">Tunggu <span id="login-toast-count">3</span> detik sebelum mencoba lagi.</p>
+        </div>
+    </div>
+</div>
 <script>
     document.getElementById('toggle-password').addEventListener('click', function () {
         var input = document.getElementById('password');
@@ -66,6 +77,53 @@
         this.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
         this.setAttribute('aria-pressed', String(show));
     });
+</script>
+<script>
+    (function () {
+        var FAILS_KEY = 'pilketos-login-fails';
+        var LOCK_KEY = 'pilketos-login-locked-until';
+        var fails = parseInt(sessionStorage.getItem(FAILS_KEY) || '0', 10) || 0;
+        // Redirect balik dengan blok error = 1 kegagalan.
+        if (document.querySelector('.bg-red-50')) {
+            fails += 1;
+            sessionStorage.setItem(FAILS_KEY, String(fails));
+        }
+        var submit = document.getElementById('login-submit');
+        var toast = document.getElementById('login-toast');
+        var countEl = document.getElementById('login-toast-count');
+        function unlock() {
+            submit.disabled = false;
+            toast.classList.add('hidden');
+            sessionStorage.setItem(FAILS_KEY, '0');
+            sessionStorage.removeItem(LOCK_KEY);
+        }
+        function lock(seconds) {
+            var until = Date.now() + seconds * 1000;
+            sessionStorage.setItem(LOCK_KEY, String(until));
+            submit.disabled = true;
+            toast.classList.remove('hidden');
+            countEl.textContent = String(seconds);
+            var left = seconds;
+            var timer = setInterval(function () {
+                left -= 1;
+                if (left <= 0) {
+                    clearInterval(timer);
+                    unlock();
+                } else {
+                    countEl.textContent = String(left);
+                }
+            }, 1000);
+        }
+        // Lanjutan kunci dari percobaan sebelumnya (mis. refresh saat terkunci).
+        var lockedUntil = parseInt(sessionStorage.getItem(LOCK_KEY) || '0', 10) || 0;
+        if (lockedUntil > Date.now()) {
+            lock(Math.ceil((lockedUntil - Date.now()) / 1000));
+        } else if (lockedUntil) {
+            unlock();
+        } else if (fails >= 3) {
+            lock(3);
+        }
+    })();
 </script>
 </body>
 </html>
