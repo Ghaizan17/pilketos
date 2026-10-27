@@ -6,6 +6,7 @@
     <title>Login Bilik — Pilketos SMKN 2 Banjarmasin</title>
     <link rel="icon" href="{{ asset('images/logo-smkn2.png') }}">
     @vite(['resources/css/app.css'])
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 </head>
 <body class="relative min-h-screen overflow-x-hidden bg-slate-100 font-sans text-slate-900 antialiased">
 <div aria-hidden="true" class="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-indigo-300/40 blur-3xl booth-blob"></div>
@@ -56,17 +57,6 @@
     </div>
 
     <a href="{{ route('home') }}" class="mt-6 text-xs font-semibold text-slate-500 hover:text-indigo-600">← Kembali ke beranda</a>
-<div id="login-toast" class="pointer-events-none fixed left-1/2 top-4 z-50 hidden w-[calc(100%-2rem)] max-w-sm -translate-x-1/2" role="alert">
-    <div class="flex items-start gap-3 rounded-2xl border border-red-200 bg-white p-4 shadow-2xl">
-        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100">
-            <svg class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01" /></svg>
-        </div>
-        <div class="min-w-0">
-            <p id="login-toast-title" class="text-sm font-bold text-slate-900">Login gagal</p>
-            <p id="login-toast-body" class="text-xs text-slate-500">Username atau password salah.</p>
-        </div>
-    </div>
-</div>
 <script>
     document.getElementById('toggle-password').addEventListener('click', function () {
         var input = document.getElementById('password');
@@ -80,33 +70,30 @@
 </script>
 <script>
     (function () {
+        // SweetAlert2 dimuat via CDN (defer) — jangan tembak toast sebelum ia siap.
+        if (typeof Swal === 'undefined') {
+            window.addEventListener('load', function () { start(); });
+        } else {
+            start();
+        }
+        function start() {
         var FAILS_KEY = 'pilketos-login-fails';
         var LOCK_KEY = 'pilketos-login-locked-until';
         var fails = parseInt(sessionStorage.getItem(FAILS_KEY) || '0', 10) || 0;
         var submit = document.getElementById('login-submit');
-        var toast = document.getElementById('login-toast');
-        var titleEl = document.getElementById('login-toast-title');
-        var bodyEl = document.getElementById('login-toast-body');
         var errorEl = document.getElementById('login-error');
-        // Redirect balik dengan error = 1 kegagalan.
-        if (errorEl) {
-            fails += 1;
-            sessionStorage.setItem(FAILS_KEY, String(fails));
-        }
-        function hideToast() {
-            toast.classList.add('hidden');
-        }
-        function showToast(title, bodyHtml, autoHideMs) {
-            titleEl.textContent = title;
-            bodyEl.innerHTML = bodyHtml;
-            toast.classList.remove('hidden');
-            if (autoHideMs) {
-                setTimeout(hideToast, autoHideMs);
-            }
-        }
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timerProgressBar: true,
+            didOpen: function (toast) {
+                toast.addEventListener('mouseenter', Swal.stopTimer);
+                toast.addEventListener('mouseleave', Swal.resumeTimer);
+            },
+        });
         function unlock() {
             submit.disabled = false;
-            hideToast();
             sessionStorage.setItem(FAILS_KEY, '0');
             sessionStorage.removeItem(LOCK_KEY);
         }
@@ -114,16 +101,15 @@
             var until = Date.now() + seconds * 1000;
             sessionStorage.setItem(LOCK_KEY, String(until));
             submit.disabled = true;
-            showToast('Terlalu banyak percobaan', 'Tunggu <span id="login-toast-count">' + seconds + '</span> detik sebelum mencoba lagi.');
             var left = seconds;
+            Toast.fire({ icon: 'error', title: 'Terlalu banyak percobaan', html: 'Tunggu <b>' + left + '</b> detik sebelum mencoba lagi.', timer: seconds * 1000 });
             var timer = setInterval(function () {
                 left -= 1;
                 if (left <= 0) {
                     clearInterval(timer);
                     unlock();
                 } else {
-                    var countEl = document.getElementById('login-toast-count');
-                    if (countEl) countEl.textContent = String(left);
+                    Swal.getHtmlContainer().querySelector('b').textContent = String(left);
                 }
             }, 1000);
         }
@@ -137,7 +123,8 @@
             lock(3);
         } else if (errorEl) {
             // Salah ke-1/2: tampilkan pesan error sebagai toast yang hilang sendiri.
-            showToast('Login gagal', errorEl.textContent.trim() || 'Username atau password salah.', 4000);
+            Toast.fire({ icon: 'error', title: 'Login gagal', text: errorEl.textContent.trim() || 'Username atau password salah.', timer: 4000 });
+        }
         }
     })();
 </script>
