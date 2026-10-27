@@ -77,6 +77,7 @@ class CandidateResource extends Resource
             ->columns([
                 ImageColumn::make('photo_path')
                     ->label('Foto')
+                    ->disk('public')
                     ->circular()
                     ->defaultImageUrl(fn (): string => 'https://placehold.co/100x125?text=No+Foto'),
                 TextColumn::make('number')
