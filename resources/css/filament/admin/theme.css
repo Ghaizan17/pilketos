@@ -147,12 +147,8 @@
     }
 
     /* Login form polish */
-    .fi-simple-page .fi-simple-main .fi-logo {
-        justify-content: center;
-        height: 4.5rem;
-    }
-
-    .fi-simple-page .fi-simple-main .fi-logo img {
+    .fi-simple-page .fi-simple-header .fi-logo {
+        height: 6rem !important;
         border-radius: 1rem;
         box-shadow: 0 8px 20px -8px rgb(15 23 42 / 0.35);
     }
