@@ -186,6 +186,7 @@
         x-cloak
         class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
         role="alertdialog" aria-modal="true" aria-label="Konfirmasi pilihan"
+        style="display: none"
     >
         <div
             x-show="state === 'confirm_popup'"
@@ -242,6 +243,7 @@
         x-cloak
         class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
         role="alertdialog" aria-modal="true" aria-label="QR tidak dikenal"
+        style="display: none"
     >
         <div x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-2xl">
             <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 ring-1 ring-red-200">
