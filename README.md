@@ -1,110 +1,60 @@
-# Pilketos — SMKN 2 Banjarmasin
+<p align="center">
+  <img src="public/images/logo-smkn2.png" width="120" alt="Logo SMKN 2 Banjarmasin">
+</p>
 
-Aplikasi voting Ketua & Wakil Ketua OSIS berbasis **QR code sekali pakai**.
-Setiap murid mendapat kartu QR pribadi; operator bilik memindai QR untuk membuka
-halaman pilihan, murid memilih satu paslon lalu mengunci pilihannya.
-Satu QR hanya berlaku untuk satu suara.
+<h1 align="center">Pilketos — SMKN 2 Banjarmasin</h1>
 
-Stack: Laravel 13 + Filament 5 (panel admin) + SQLite + Tailwind 4 + Alpine.js
-+ zxing-wasm (scan QR via kamera) + DomPDF/FPDI (cetak kartu QR).
+<p align="center">Aplikasi voting Ketua & Wakil Ketua OSIS berbasis QR code sekali pakai.</p>
 
-## Alur pemakaian
+Setiap murid mendapat kartu QR pribadi dari panitia. Pada hari pemilihan,
+operator bilik memindai QR murid untuk membuka halaman pilihan, murid memilih
+satu paslon lalu mengunci pilihannya. Satu QR hanya berlaku untuk satu suara —
+setelah dipakai, QR tidak bisa memilih lagi.
 
-### Persiapan (panitia / operator)
+## Fitur
 
-1. Buka panel admin di `/admin` dan login sebagai operator.
-2. **Import Murid** — unggah file Excel Dapodik
-   (`daftar_pd-*.xlsx`, data mulai baris 7; kolom Nama, NIPD, JK, NISN, Rombel
-   terdeteksi otomatis). Setiap murid otomatis mendapat UUID untuk QR-nya.
-3. **Kandidat** — tambah paslon (nomor urut, nama ketua & wakil, tagline, foto).
-4. **Cetak QR** — unduh kartu QR massal (`/students/qr-cards.pdf`, 4 kartu
-   per halaman A4) atau per murid langsung dari tabel Murid
-   (tombol *Cetak QR* → file PDF terunduh otomatis).
-5. **Pemilihan** — buka/tutup pemilihan dari halaman Pengaturan Pemilihan.
-   Saat ditutup, `/bilik` menampilkan status "Pemilihan Ditutup".
+- **Halaman utama** — profil paslon, status pemilihan (dibuka/ditutup), dan
+  tombol masuk ke bilik suara.
+- **Bilik suara** — scan QR via kamera, pilih paslon (2 paslon tampil
+  kiri-kanan dengan foto penuh), popup konfirmasi, bunyi sukses + toast hijau
+  saat suara tercatat.
+- **Panel admin** (`/admin`) — kelola murid (import Excel Dapodik), kandidat,
+  pengguna, dan suara; cetak kartu QR massal (4 per halaman A4) atau per murid
+  (langsung unduh PDF); buka/tutup pemilihan; dashboard hasil suara.
+- **Login bilik** (`/login`) — khusus operator/scan dengan tombol show/hide
+  password.
 
-### Hari-H (bilik suara)
-
-1. Operator login di `/login` (username + password + tombol show/hide password).
-2. Buka `/bilik` — arahkan QR murid ke bingkai kamera (otomatis terdeteksi).
-3. Modal **Pilih Paslon** muncul (2 paslon tampil kiri-kanan, foto memenuhi
-   kartu). Pilih satu paslon → **Pilih Paslon Ini** → popup **Kunci pilihan?**
-   → **Ya, Konfirmasi**.
-4. Suara tercatat → bunyi sukses + toast hijau → kembali ke mode scan.
-   QR salah menampilkan modal *QR Tidak Dikenal*; QR yang sudah dipakai
-   menampilkan *Sudah Memilih*.
-5. Keluar via tombol *Keluar* (atau POST `/keluar`).
-
-### Peran pengguna
-
-| Role | Login | Akses |
-| --- | --- | --- |
-| `operator` | `/admin/login` dan `/login` | Penuh: panel admin, cetak QR, bilik scan |
-| `scanner` | `/login` saja | Hanya `/bilik` (ditolak di `/admin` dan unduhan QR dengan 403) |
-
-Akun bawaan (ganti password setelah login pertama):
-
-| Username | Password | Role |
-| --- | --- | --- |
-| `operatorskenda` | `operatorskenda123` | operator |
-| `operatorscan` | `operatorscan123` | scanner |
-
-## Menjalankan secara lokal
-
-Syarat: PHP 8.4 + Composer + Node 24. Ekstensi PHP: `sqlite3/pdo_sqlite`,
-`gd`, `mbstring`, `xml`, `fileinfo`, `zip` (untuk import Excel).
+## Cara memasang
 
 ```bash
-# 1. Dependensi
+# 1. Clone repo
+git clone https://github.com/Ghaizan17/pilketos.git
+cd pilketos
+
+# 2. Install dependensi
 composer install
 npm install
 
-# 2. Konfigurasi
+# 3. Siapkan environment
 cp .env.example .env
 php artisan key:generate
-# DB default SQLite — pastikan database/database.sqlite ada:
 touch database/database.sqlite
 
-# 3. Migrasi + data awal (2 akun + pemilihan terbuka + data demo)
+# 4. Migrasi + data awal
 php artisan migrate --seed
 
-# 4. Build aset frontend
+# 5. Build aset frontend
 npm run build
 
-# 5. Jalankan
+# 6. Jalankan
 php artisan serve
 ```
 
-Buka `http://127.0.0.1:8000` (halaman utama), `/admin` (panel admin),
-`/login` (login bilik), `/bilik` (scan — butuh login + kamera/HTTPS).
+Lalu buka:
 
-Perintah berguna:
+- `http://127.0.0.1:8000` — halaman utama
+- `http://127.0.0.1:8000/admin` — panel admin
+- `http://127.0.0.1:8000/login` — login bilik
+- `http://127.0.0.1:8000/bilik` — scan suara (perlu login + kamera)
 
-```bash
-php artisan test                    # seluruh test (19 test)
-php artisan test --filter=BoothAuthTest
-npm run dev                         # dev server Vite (hot reload)
-php artisan pilketos:clear-demo     # hapus data demo (nipd DEMO*)
-```
-
-## Struktur penting
-
-- `routes/web.php` — `/`, `/login`, `/bilik`, `/api/voters|votes`, cetak QR.
-- `app/Filament/` — panel admin: Resources (Murid, Kandidat, User, Suara),
-  Pages (Import Murid, Cetak QR, Pengaturan Pemilihan), Widgets dashboard.
-- `resources/views/booth/` — `home.blade.php`, `login.blade.php`, `scan.blade.php`.
-- `resources/js/booth.js` — state machine bilik
-  (`scanning → resolving → selecting → confirm_popup → confirming`,
-  error: `unknown_qr | already_voted | camera_error`) + audio sukses.
-- `resources/views/students/qr-*.blade.php` — template kartu QR
-  (massal A4 + perorangan, QR sebagai data-URI SVG agar lolos DomPDF).
-- `public/sounds/vote-success.mp3` — audio saat suara tercatat.
-
-## Catatan operasional
-
-- Bilik butuh kamera + konteks aman (HTTPS atau `localhost`) agar
-  `getUserMedia` diizinkan browser.
-- Foto paslon di modal memakai `object-top` — wajah tetap terlihat pada
-  crop landscape.
-- Import massal menampilkan overlay error generik berbahasa Inggris bila
-  server kehabisan memori/waktu — lihat `storage/logs/laravel.log`.
+Teknologi: Laravel + Filament + SQLite + Tailwind + Alpine.js.
