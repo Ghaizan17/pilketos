@@ -61,7 +61,7 @@
     <main id="paslon" class="mt-12 w-full scroll-mt-6" style="animation-delay:.16s">
         <h2 class="text-center text-sm font-bold uppercase tracking-widest text-slate-400">Pasangan Calon</h2>
         <p class="mt-1 text-center text-sm text-slate-500">Kenali calon ketua &amp; wakil ketua OSIS periode ini.</p>
-        <div class="mt-5 grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="mt-5 grid w-full grid-cols-1 gap-5 sm:grid-cols-2 {{ count($candidates) === 2 ? 'mx-auto max-w-3xl' : 'lg:grid-cols-3' }}">
             @foreach ($candidates as $candidate)
                 <article class="booth-fade-up group mx-auto w-full max-w-sm overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-600/10">
                     <div class="relative">
