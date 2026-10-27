@@ -114,7 +114,7 @@
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-            class="max-h-[95vh] w-full max-w-6xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-4 shadow-2xl sm:p-5"
+            class="flex h-[95vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 shadow-2xl sm:p-5"
         >
             <div class="flex items-center gap-3">
                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ring-1"
@@ -129,8 +129,8 @@
                 </div>
             </div>
 
-            <p class="mt-3 text-base font-semibold text-slate-700">Pilih salah satu paslon:</p>
-            <div class="mt-3 grid gap-4 sm:gap-5" :class="candidates.length === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'">
+            <p class="mt-3 shrink-0 text-base font-semibold text-slate-700">Pilih salah satu paslon:</p>
+            <div class="mt-3 grid min-h-0 flex-1 items-stretch gap-4 sm:gap-5" :class="candidates.length === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'">
                 <template x-for="c in candidates" :key="c.id">
                     <button
                         type="button"
@@ -138,14 +138,14 @@
                         :class="selectedId === c.id
                             ? 'border-indigo-500 bg-indigo-50 shadow-lg shadow-indigo-500/15'
                             : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/50'"
-                        class="overflow-hidden rounded-2xl border-2 text-left transition active:scale-[0.98]"
+                        class="flex min-h-0 flex-col overflow-hidden rounded-2xl border-2 text-left transition active:scale-[0.98]"
                     >
-                        <div class="relative leading-[0]">
+                        <div class="relative min-h-0 flex-1 leading-[0]">
                             <template x-if="c.photo">
-                                <img :src="c.photo" :alt="'Paslon No. ' + c.number" class="block aspect-[16/9] w-full object-cover object-top">
+                                <img :src="c.photo" :alt="'Paslon No. ' + c.number" class="absolute inset-0 block h-full w-full object-cover object-top">
                             </template>
                             <template x-if="!c.photo">
-                                <div class="flex aspect-[16/9] w-full items-center justify-center bg-slate-100">
+                                <div class="absolute inset-0 flex items-center justify-center bg-slate-100">
                                     <span class="text-7xl font-black text-slate-300" x-text="c.number"></span>
                                 </div>
                             </template>
@@ -154,7 +154,7 @@
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                             </span>
                         </div>
-                        <div class="p-3 leading-normal">
+                        <div class="shrink-0 p-3 leading-normal">
                             <p class="text-base font-bold text-slate-900" x-text="c.ketua + ' & ' + c.wakil"></p>
                             <p class="mt-0.5 text-sm italic text-slate-500" x-show="c.tagline" x-text="c.tagline"></p>
                         </div>
@@ -162,9 +162,9 @@
                 </template>
             </div>
 
-            <p class="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-700 ring-1 ring-amber-200" x-show="notice" x-text="notice"></p>
+            <p class="mt-3 shrink-0 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-700 ring-1 ring-amber-200" x-show="notice" x-text="notice"></p>
 
-            <div class="mt-5 flex gap-2">
+            <div class="mt-3 flex shrink-0 gap-2">
                 <button
                     type="button"
                     @click="resetToScanning()"
@@ -177,7 +177,6 @@
                     class="flex-[2] rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
                 ><span x-text="confirming ? 'Mencatat…' : 'Pilih Paslon Ini'"></span></button>
             </div>
-        </div>
     </div>
 
     {{-- Modal 2: Popup konfirmasi --}}
