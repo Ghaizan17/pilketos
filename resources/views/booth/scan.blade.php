@@ -114,7 +114,7 @@
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-            class="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl sm:p-8"
+            class="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-8"
         >
             <div class="flex items-center gap-4">
                 <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl ring-1"
@@ -129,8 +129,8 @@
                 </div>
             </div>
 
-            <p class="mt-5 text-sm font-semibold text-slate-700">Pilih salah satu paslon:</p>
-            <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <p class="mt-5 text-base font-semibold text-slate-700">Pilih salah satu paslon:</p>
+            <div class="mt-4 grid gap-4 sm:gap-5" :class="candidates.length === 2 ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'">
                 <template x-for="c in candidates" :key="c.id">
                     <button
                         type="button"
@@ -140,23 +140,23 @@
                             : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/50'"
                         class="overflow-hidden rounded-2xl border-2 text-left transition active:scale-[0.98]"
                     >
-                        <div class="relative">
+                        <div class="relative leading-[0]">
                             <template x-if="c.photo">
-                                <img :src="c.photo" :alt="'Paslon No. ' + c.number" class="aspect-[4/5] w-full object-cover">
+                                <img :src="c.photo" :alt="'Paslon No. ' + c.number" class="block aspect-[3/4] w-full object-cover">
                             </template>
                             <template x-if="!c.photo">
-                                <div class="flex aspect-[4/5] w-full items-center justify-center bg-slate-100">
-                                    <span class="text-6xl font-black text-slate-300" x-text="c.number"></span>
+                                <div class="flex aspect-[3/4] w-full items-center justify-center bg-slate-100">
+                                    <span class="text-7xl font-black text-slate-300" x-text="c.number"></span>
                                 </div>
                             </template>
-                            <span class="absolute left-2 top-2 rounded-full bg-slate-900/70 px-2.5 py-1 text-xs font-black text-white backdrop-blur" x-text="'No. ' + c.number"></span>
-                            <span class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-white" x-show="selectedId === c.id">
+                            <span class="absolute left-3 top-3 rounded-full bg-slate-900/70 px-3 py-1 text-sm font-black text-white backdrop-blur" x-text="'No. ' + c.number"></span>
+                            <span class="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-white" x-show="selectedId === c.id">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                             </span>
                         </div>
-                        <div class="p-3">
-                            <p class="text-sm font-semibold text-slate-900" x-text="c.ketua + ' & ' + c.wakil"></p>
-                            <p class="mt-0.5 text-xs italic text-slate-500" x-show="c.tagline" x-text="c.tagline"></p>
+                        <div class="p-4 leading-normal">
+                            <p class="text-base font-bold text-slate-900" x-text="c.ketua + ' & ' + c.wakil"></p>
+                            <p class="mt-1 text-sm italic text-slate-500" x-show="c.tagline" x-text="c.tagline"></p>
                         </div>
                     </button>
                 </template>
