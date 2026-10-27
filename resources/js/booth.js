@@ -194,6 +194,16 @@ Alpine.data('booth', (config = {}) => ({
         return (this.student?.name ?? '?').trim().charAt(0).toUpperCase() || '?';
     },
 
+    pushToast(message) {
+        const id = ++this.toastSeq;
+        this.toasts.push({ id, message });
+        setTimeout(() => this.dismissToast(id), 3000);
+    },
+
+    dismissToast(id) {
+        this.toasts = this.toasts.filter((t) => t.id !== id);
+    },
+
     playSuccessSound() {
         try {
             const audio = new Audio('/sounds/vote-success.mp3');
