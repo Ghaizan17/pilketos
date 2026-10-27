@@ -33,6 +33,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/students/qr-cards', [App\Http\Controllers\StudentQrCardController::class, 'bulk'])->name('students.qr-cards');
         Route::get('/students/qr-cards.pdf', [App\Http\Controllers\StudentQrCardController::class, 'pdf'])->name('students.qr-cards.pdf');
         Route::get('/students/qr-pdf/{job}', [App\Http\Controllers\StudentQrCardController::class, 'file'])->name('students.qr-pdf-file')->where('job', '[0-9a-f-]+');
-        Route::get('/students/{student:uuid}/qr-card', [App\Http\Controllers\StudentQrCardController::class, 'show'])->name('students.qr-card');
+        Route::get('/students/{student:uuid}/qr-card.pdf', [App\Http\Controllers\StudentQrCardController::class, 'singlePdf'])->name('students.qr-card.pdf');
     });
 });

@@ -8,11 +8,21 @@ use Illuminate\View\View;
 
 class StudentQrCardController extends Controller
 {
-    public function show(Student $student): View
+    public function singlePdf(Student $student): \Symfony\Component\HttpFoundation\Response
     {
         $student->loadMissing('classroom');
 
-        return view('students.qr-card', ['student' => $student]);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('students.qr-card-pdf', [
+            'student' => $student,
+            'qrUri' => $this->qrDataUri($student),
+        ])->setPaper('a4', 'portrait')->output();
+
+        $slug = \Illuminate\Support\Str::slug($student->nipd ?: $student->name);
+
+        return response($pdf, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="kartu-qr-'.$slug.'.pdf"',
+        ]);
     }
 
     public function bulk(Request $request): View

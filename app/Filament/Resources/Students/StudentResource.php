@@ -119,8 +119,7 @@ class StudentResource extends Resource
                 Action::make('qr')
                     ->label('Cetak QR')
                     ->icon(Heroicon::OutlinedQrCode)
-                    ->url(fn (Student $record): string => route('students.qr-card', $record))
-                    ->openUrlInNewTab(),
+                    ->url(fn (Student $record): string => route('students.qr-card.pdf', $record)),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
