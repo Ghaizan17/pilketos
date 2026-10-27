@@ -177,6 +177,7 @@
                     class="flex-[2] rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
                 ><span x-text="confirming ? 'Mencatat…' : 'Pilih Paslon Ini'"></span></button>
             </div>
+        </div>
     </div>
 
     {{-- Modal 2: Popup konfirmasi --}}
@@ -191,7 +192,7 @@
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 scale-90 translate-y-4"
             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-            class="booth-fade-up w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-2xl"
+            class="w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-2xl"
         >
             <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 ring-1 ring-indigo-200">
                 <svg class="h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
