@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pilketos — SMKN 2 Banjarmasin</title>
     <link rel="icon" href="{{ asset('images/logo-smkn2.png') }}">
-</head>
+    @vite(['resources/css/app.css'])
 <body class="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
 <div class="mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center px-4 py-10">
     {{-- Brand --}}
