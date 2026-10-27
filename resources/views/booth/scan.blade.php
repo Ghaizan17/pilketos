@@ -10,7 +10,7 @@
 <body class="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
 <div
     x-data="booth({ closed: {{ $isOpen ? 'false' : 'true' }}, candidates: {{ Js::from($candidatesPayload) }} })"
-    class="mx-auto flex min-h-screen w-full max-w-xl flex-col items-center px-4 py-8"
+    class="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center px-4 py-8"
 >
     <!-- <div class="flex w-full items-center justify-between">
         <a href="{{ route('home') }}" class="text-xs font-semibold text-slate-500 hover:text-indigo-600">← Beranda</a>
@@ -41,19 +41,19 @@
         {{-- Scanner card --}}
         <div class="booth-fade-up mt-8 w-full rounded-3xl border border-slate-200 bg-white p-5 shadow-xl shadow-slate-900/5" x-show="['scanning','resolving','camera_error'].includes(state)">
             {{-- Viewfinder --}}
-            <div class="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-slate-900 ring-1 ring-slate-900/10">
+            <div class="relative aspect-square w-full overflow-hidden rounded-2xl bg-slate-900 ring-1 ring-slate-900/10">
                 <video x-ref="video" class="h-full w-full object-cover" playsinline muted></video>
 
                 {{-- dim + frame --}}
                 <div class="pointer-events-none absolute inset-0" x-show="cameraOn">
-                    <div class="absolute inset-0 bg-black/30" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 0, 12% 12%, 12% 88%, 88% 88%, 88% 12%, 12% 12%);"></div>
+                    <div class="absolute inset-0 bg-black/30" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 0, 6% 6%, 6% 94%, 94% 94%, 94% 6%, 6% 6%);"></div>
                     {{-- corner brackets --}}
-                    <div class="absolute left-[12%] top-[12%] h-8 w-8 rounded-tl-xl border-l-4 border-t-4 border-indigo-500"></div>
-                    <div class="absolute right-[12%] top-[12%] h-8 w-8 rounded-tr-xl border-r-4 border-t-4 border-indigo-500"></div>
-                    <div class="absolute bottom-[12%] left-[12%] h-8 w-8 rounded-bl-xl border-b-4 border-l-4 border-indigo-500"></div>
-                    <div class="absolute bottom-[12%] right-[12%] h-8 w-8 rounded-br-xl border-b-4 border-r-4 border-indigo-500"></div>
+                    <div class="absolute left-[6%] top-[6%] h-10 w-10 rounded-tl-xl border-l-4 border-t-4 border-indigo-500"></div>
+                    <div class="absolute right-[6%] top-[6%] h-10 w-10 rounded-tr-xl border-r-4 border-t-4 border-indigo-500"></div>
+                    <div class="absolute bottom-[6%] left-[6%] h-10 w-10 rounded-bl-xl border-b-4 border-l-4 border-indigo-500"></div>
+                    <div class="absolute bottom-[6%] right-[6%] h-10 w-10 rounded-br-xl border-b-4 border-r-4 border-indigo-500"></div>
                     {{-- laser --}}
-                    <div class="booth-laser absolute left-[14%] right-[14%] h-0.5 rounded-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_18px_3px_rgba(34,211,238,0.8)]" x-show="state === 'scanning'"></div>
+                    <div class="booth-laser absolute left-[8%] right-[8%] h-0.5 rounded-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_18px_3px_rgba(34,211,238,0.8)]" x-show="state === 'scanning'"></div>
                     {{-- pulse ring saat resolving --}}
                     <div class="absolute inset-0 flex items-center justify-center" x-show="state === 'resolving'">
                         <div class="booth-pulse-ring absolute h-28 w-28 rounded-full border-2 border-cyan-300"></div>
@@ -263,10 +263,6 @@
             <button type="button" @click="resetToScanning()" class="mt-5 w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white transition hover:bg-slate-700 active:scale-[0.98]">Kembali Scan</button>
         </div>
     </div>
-
-    <footer class="mt-8 text-center text-xs text-slate-500">
-        Satu QR hanya berlaku untuk satu suara • Pilihan Anda bersifat rahasia
-    </footer>
 </div>
 </body>
 </html>

@@ -92,11 +92,21 @@
         border-radius: var(--admin-radius);
     }
 
-    .fi-section {
-        border: 1px solid rgb(15 23 42 / 0.06);
-        box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+    /* ---------- Dashboard: samakan tinggi chart pie dengan tumpukan card ---------- */
+    .fi-wi-widget:has(.fi-wi-chart) {
+        height: 100%;
     }
 
+    .fi-wi-widget:has(.fi-wi-chart) .fi-section,
+    .fi-wi-widget:has(.fi-wi-chart) .fi-section-content-ctn,
+    .fi-wi-widget:has(.fi-wi-chart) .fi-section-content {
+        height: 100%;
+    }
+
+    .fi-wi-widget:has(.fi-wi-chart) .fi-wi-chart-frame-no-aspect-ratio {
+        height: 100%;
+        min-height: 380px;
+    }
     /* ---------- Stats: airy value type ---------- */
     .fi-wi-stats-overview-stat-value {
         letter-spacing: -0.02em;

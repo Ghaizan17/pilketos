@@ -11,6 +11,10 @@ class VotesPerCandidateChart extends ChartWidget
 
     protected ?string $pollingInterval = '5s';
 
+    // Tanpa aspect-ratio: Chart.js responsif penuh mengikuti tinggi wadah grid,
+    // agar sejajar dengan tumpukan card di kanan. Tinggi min menjaga pie tetap lega.
+    protected ?string $maxHeight = '420px';
+
     protected function getType(): string
     {
         return 'pie';
@@ -41,6 +45,9 @@ class VotesPerCandidateChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'responsive' => true,
+            'maintainAspectRatio' => false,
+            'layout' => ['padding' => 8],
             'plugins' => [
                 'legend' => ['position' => 'bottom'],
             ],

@@ -12,6 +12,7 @@ class BoothAuthController extends Controller
     public function show(): View|RedirectResponse
     {
         if (Auth::check()) {
+            // /login selalu ke halaman scan (bukan admin) untuk kedua role.
             return redirect()->route('booth.scan');
         }
 
@@ -33,6 +34,8 @@ class BoothAuthController extends Controller
 
         $request->session()->regenerate();
 
+        // Login bilik (operator maupun scanner) selalu mendarat di /bilik.
+        // Akses /admin tetap lewat /admin/login (canAccessPanel menolak scanner).
         return redirect()->intended(route('booth.scan'));
     }
 

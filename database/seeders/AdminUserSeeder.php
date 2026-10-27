@@ -23,6 +23,7 @@ class AdminUserSeeder extends Seeder
                 'email' => 'operator@pilketos.local',
                 // Hashed by the User model's 'hashed' cast — store plain here.
                 'password' => 'operatorskenda123',
+                'role' => User::ROLE_OPERATOR,
             ],
         );
 
@@ -32,6 +33,7 @@ class AdminUserSeeder extends Seeder
                 'name' => 'Operator Scan Bilik',
                 'email' => 'scan@pilketos.local',
                 'password' => 'operatorscan123',
+                'role' => User::ROLE_SCANNER,
             ],
         );
 

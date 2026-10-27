@@ -56,6 +56,15 @@ class UserResource extends Resource
                     ->email()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
+                \Filament\Forms\Components\Select::make('role')
+                    ->label('Role')
+                    ->helperText('Operator: semua halaman. Scanner: hanya halaman scan.')
+                    ->options([
+                        User::ROLE_OPERATOR => 'Operator',
+                        User::ROLE_SCANNER => 'Scanner',
+                    ])
+                    ->default(User::ROLE_SCANNER)
+                    ->required(),
                 TextInput::make('password')
                     ->label('Password')
                     ->helperText('Kosongkan bila tidak ingin mengubah password.')
@@ -84,6 +93,12 @@ class UserResource extends Resource
                     ->copyable()
                     ->badge()
                     ->color('primary'),
+                TextColumn::make('role')
+                    ->label('Role')
+                    ->badge()
+                    ->color(fn (string $state): string => $state === User::ROLE_OPERATOR ? 'success' : 'info')
+                    ->formatStateUsing(fn (string $state): string => $state === User::ROLE_OPERATOR ? 'Operator' : 'Scanner')
+                    ->sortable(),
                 TextColumn::make('email')
                     ->label('Email')
                     ->searchable()

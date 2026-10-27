@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Widgets\ElectionStatsOverview;
 use App\Filament\Widgets\TurnoutPerClassroomChart;
 use App\Filament\Widgets\VotesPerCandidateChart;
+use App\Filament\Widgets\VotesPerCandidateStats;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -52,6 +53,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 ElectionStatsOverview::class,
                 VotesPerCandidateChart::class,
+                VotesPerCandidateStats::class,
                 TurnoutPerClassroomChart::class,
             ])
             ->middleware([

@@ -51,7 +51,7 @@
                 Masuk Bilik Suara
             </a>
         @else
-            <a href="{{ route('booth.login') }}" class="w-full max-w-sm rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-500 px-6 py-4 text-center text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition hover:scale-[1.02] active:scale-[0.98]">
+            <a href="{{ route('login') }}" class="w-full max-w-sm rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-500 px-6 py-4 text-center text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition hover:scale-[1.02] active:scale-[0.98]">
                 Login Operator Bilik
             </a>
             <p class="text-xs text-slate-400">Hanya operator bilik yang dapat membuka halaman scan.</p>

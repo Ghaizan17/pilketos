@@ -1,9 +1,8 @@
 import Alpine from 'alpinejs';
 import { readBarcodes } from 'zxing-wasm/reader';
 
-const SCAN_WIDTH = 640;
-const SCAN_HEIGHT = 480;
-const SCAN_DELAY_MS = 150;
+const SCAN_SIZE = 960;
+const SCAN_DELAY_MS = 120;
 
 Alpine.data('booth', (config = {}) => ({
     // ---- state machine ----
@@ -70,9 +69,11 @@ Alpine.data('booth', (config = {}) => ({
         }
         try {
             if (this.stream) this.stopTracks();
-            const video = this.selectedDeviceId
+            const base = this.selectedDeviceId
                 ? { deviceId: { exact: this.selectedDeviceId } }
                 : { facingMode: { ideal: 'environment' } };
+            // Minta resolusi HD agar QR kecil/jauh tetap terbaca; crop persegi mengikuti viewfinder.
+            const video = { ...base, width: { ideal: 1280 }, height: { ideal: 720 } };
             this.stream = await navigator.mediaDevices.getUserMedia({ video, audio: false });
             const el = this.$refs.video;
             el.srcObject = this.stream;
@@ -124,12 +125,18 @@ Alpine.data('booth', (config = {}) => ({
         try {
             if (!this.scanCanvas) {
                 this.scanCanvas = document.createElement('canvas');
-                this.scanCanvas.width = SCAN_WIDTH;
-                this.scanCanvas.height = SCAN_HEIGHT;
+                this.scanCanvas.width = SCAN_SIZE;
+                this.scanCanvas.height = SCAN_SIZE;
             }
+            // Crop persegi tengah (seperti object-cover di viewfinder yang kini aspect-square).
+            const vw = video.videoWidth || SCAN_SIZE;
+            const vh = video.videoHeight || SCAN_SIZE;
+            const side = Math.min(vw, vh);
+            const sx = (vw - side) / 2;
+            const sy = (vh - side) / 2;
             const ctx = this.scanCanvas.getContext('2d', { willReadFrequently: true });
-            ctx.drawImage(video, 0, 0, SCAN_WIDTH, SCAN_HEIGHT);
-            const imageData = ctx.getImageData(0, 0, SCAN_WIDTH, SCAN_HEIGHT);
+            ctx.drawImage(video, sx, sy, side, side, 0, 0, SCAN_SIZE, SCAN_SIZE);
+            const imageData = ctx.getImageData(0, 0, SCAN_SIZE, SCAN_SIZE);
             const results = await readBarcodes(imageData, {
                 tryHarder: true,
                 formats: ['QRCode'],
