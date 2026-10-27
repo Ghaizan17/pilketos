@@ -20,6 +20,7 @@ class VoterController extends Controller
 
         $student = Student::query()
             ->with('classroom')
+            ->withExists('vote as already_voted')
             ->where('uuid', $uuid)
             ->first();
 
@@ -27,9 +28,11 @@ class VoterController extends Controller
             return response()->json(['found' => false], 404);
         }
 
+        $alreadyVoted = (bool) $student->already_voted;
+
         return response()->json([
             'found' => true,
-            'already_voted' => $student->vote()->exists(),
+            'already_voted' => $alreadyVoted,
             'student' => [
                 'uuid' => $student->uuid,
                 'name' => $student->name,
