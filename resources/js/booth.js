@@ -194,15 +194,17 @@ Alpine.data('booth', (config = {}) => ({
         return (this.student?.name ?? '?').trim().charAt(0).toUpperCase() || '?';
     },
 
-    pushToast(message) {
-        const id = ++this.toastSeq;
-        this.toasts.push({ id, message });
-        setTimeout(() => this.dismissToast(id), 3000);
+    playSuccessSound() {
+        try {
+            const audio = new Audio('/sounds/vote-success.mp3');
+            audio.play().catch(() => {
+                // Autoplay diblokir browser — biarkan hening, jangan ganggu alur.
+            });
+        } catch {
+            // Audio tidak tersedia — biarkan hening.
+        }
     },
 
-    dismissToast(id) {
-        this.toasts = this.toasts.filter((t) => t.id !== id);
-    },
 
     async confirmVote() {
         if (!this.selectedId || this.confirming) return;
@@ -224,6 +226,7 @@ Alpine.data('booth', (config = {}) => ({
             if (res.status === 201) {
                 const data = await res.json();
                 this.countedNumber = data.candidate_number;
+                this.playSuccessSound();
                 this.pushToast(`Suara ${this.student?.name ?? ''} tercatat untuk Paslon No. ${data.candidate_number}`);
                 this.resetToScanning();
                 return;
