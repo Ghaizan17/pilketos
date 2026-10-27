@@ -89,6 +89,11 @@
         var fails = parseInt(sessionStorage.getItem(FAILS_KEY) || '0', 10) || 0;
         var submit = document.getElementById('login-submit');
         var errorEl = document.getElementById('login-error');
+        // Redirect balik dengan error = 1 kegagalan.
+        if (errorEl) {
+            fails += 1;
+            sessionStorage.setItem(FAILS_KEY, String(fails));
+        }
         var Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -128,7 +133,7 @@
         } else if (lockedUntil) {
             unlock();
         } else if (fails >= 3) {
-            lock(3);
+            lock(30);
         } else if (errorEl) {
             // Salah ke-1/2: tampilkan pesan error sebagai toast yang hilang sendiri.
             Toast.fire({ icon: 'error', title: 'Login gagal', text: errorEl.textContent.trim() || 'Username atau password salah.', timer: 4000 });
